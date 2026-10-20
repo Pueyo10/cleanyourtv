@@ -9,10 +9,10 @@
 
     <!-- Apps pinned to the dock row at the bottom, in this order. Missing apps are skipped. -->
     <string-array name="dock_apps">
+        <item>com.nuvio.tv</item>
+        <item>tv.accedo.mitele_xdk</item>
         <item>com.netflix.ninja</item>
-        <item>com.amazon.amazonvideo.livingroom</item>
         <item>com.google.android.youtube.tv</item>
-        <item>in.startv.hotstar</item>
     </string-array>
 
     <!-- Apps never shown as tiles (e.g. the Live TV app, which the Inputs menu already covers). -->
@@ -41,13 +41,15 @@
     <string name="input_action" translatable="false"></string>
 
     <!-- Name added to the greeting, e.g. "Good evening, Ana". Leave empty for the greeting alone. -->
-    <string name="greeting_name" translatable="false"></string>
+    <string name="greeting_name" translatable="false">Jon</string>
 
     <!-- Remote buttons that open an app, one "KEYCODE_NAME=package" (or "123=package") per item, for keys whose
          own app is gone, such as PatchWall. Needs the AppKeyService accessibility service: APP_KEY_SERVICE=1
          build-and-install.sh, -AppKeyService on Windows. To see what a button sends:
          tools/tv.py 'setprop log.tag.TvHomeKeys DEBUG', press it, then tools/tv.py 'logcat -d -s TvHomeKeys'. -->
     <string-array name="key_apps">
+        <item>KEYCODE_BUTTON_4=com.nuvio.tv</item>           <!-- Xiaomi PatchWall button -->
+        <item>KEYCODE_BUTTON_7=tv.accedo.mitele_xdk</item>   <!-- Xiaomi Prime Video button -->
     </string-array>
 
     <!-- Show the Solar Hijri (Shamsi) date used in Iran and Afghanistan, e.g. "27 Mehr 1405", above the

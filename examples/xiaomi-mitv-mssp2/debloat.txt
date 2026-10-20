@@ -1,0 +1,71 @@
+# Xiaomi MiTV-MSSP2 (codename volver, 32"), Android TV 9 (SDK 28), firmware PI.6305 (built 2021-04-20),
+# MediaTek/MStar m5621, 1.4 GB RAM (ro.config.low_ram), 1280x720. Started from xiaomi-mitv-mssp3.
+# Live TV app: com.mediatek.wwtv.tvcenter (already the live_tv_package in launcher config.xml).
+# Stock launcher: com.google.android.tvlauncher (the default, disabled by build-and-install).
+#
+# Apply:   TV_HOST=<tv ip> tools/disable.sh examples/xiaomi-mitv-mssp2/debloat.txt
+# Undo:    TV_HOST=<tv ip> tools/restore.sh examples/xiaomi-mitv-mssp2/debloat.txt
+# Everything is DISABLED, not uninstalled. Comment out any line you want to keep.
+#
+# Notes from this firmware:
+# - Only tvlauncher and Settings' FallbackHome claim HOME. PatchWall (com.mitv.tvhome.atv) does not,
+#   and neither do leanbacklauncher (boot receiver only) or setupwraith.
+# - Default IME is already Gboard, so the Mi TV 4A missing-keyboard quirk doesn't apply.
+# - No Miracast package on this firmware (no smartshare / milinkservice); com.mitv.tvhome.mitvplus
+#   (Xiaomi TV+) is not installed either.
+# - Left alone on purpose: com.mediatek.wwtv.tvcenter / tvinput* / tv.agent / mitv.service (HDMI + tuner),
+#   com.mediatek.hotkey.dispatcher, com.google.android.tv.remote.service,
+#   com.xiaomi.android.tvsetup.partnercustomizer (persistent, system uid: global remote keys and
+#   BleRcActivity, the Bluetooth remote pairing screen), MediaTek factory tools.
+# - netflixobserver (persistent, remote's Netflix button) is kept with Netflix. Unlike the MSSP3,
+#   Prime Video stayed disabled across a reboot here.
+# - Live TV with no aerial: the TV app opens a tuner session, finds no channels and closes itself
+#   after ~25 s. HDMI rows open the same app on the right port (checked with dumpsys tv_input).
+# - exec-out screencap works only when a non-secure app is on screen: Netflix in front gives an
+#   empty file. Press Home first.
+# - APK upload: toybox base64 -d stops at the first "=", and adbd here gives 49088-byte chunks
+#   (not a multiple of 3), so only the first chunk decoded until tools/b64push.py rounded it down.
+# - With backdrop disabled, point the screensaver at the launcher's clock:
+#     settings put secure screensaver_components com.gathin.tvhome/.ClockDream
+# - Location is off by default, and Android 9 then hides the SSID: the network pill says "Wi-Fi".
+# - The TV sleeps after 5 minutes without a key press and drops off the network (no ping); ADB
+#   comes back on its own when it is switched on again. That happened only because no screensaver was
+#   valid: with the Clock screensaver, sleep_timeout is -1 out of the box and the TV dreams forever.
+#   settings put secure sleep_timeout 1800000 sends it to standby after 30 minutes (checked in the log).
+# - Remote ("Xiaomi RC", Bluetooth 2717:32b9): the PatchWall button sends KEYCODE_BUTTON_4 (scan 399)
+#   and does nothing once PatchWall is disabled; the Prime Video button sends KEYCODE_BUTTON_7 (scan 207),
+#   which partnercustomizer's GlobalKey receiver turns into a Prime Video launch. Both reach accessibility
+#   services, so key_apps + APP_KEY_SERVICE=1 can give them new apps.
+
+# Xiaomi + Google telemetry
+com.miui.tv.analytics
+com.xiaomi.statistic
+com.google.android.feedback
+com.google.android.tv.bugreportsender       # Google bug report uploader, can be triggered remotely
+
+# PatchWall, content rows, sponsored rows
+com.mitv.tvhome.atv                         # PatchWall
+com.mitv.tvhome.michannel                   # PatchWall channels on the Android TV home
+com.xm.webcontent
+com.xiaomi.floatingframe
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+android.autoinstalls.config.xiaomi.amelie   # Play auto-install of partner apps
+
+# Xiaomi background services
+com.xiaomi.mitv.tvmanager                   # "TV Manager" cleaner, ran a centralservice process
+# com.xiaomi.mitv.updateservice             # firmware updates: kept on purpose
+
+# Personal choice: Ambient and Mi WallPaper screensavers (the launcher's Clock screensaver replaces them)
+com.google.android.backdrop
+com.mitv.dream
+
+# Preloaded apps
+com.mitv.gallery                            # Mi Gallery; Media Player (mediaexplorer) kept for USB
+com.google.android.play.games
+org.chromium.webview_shell                  # "WebView Browser" test shell
+
+# Personal choice: preloaded streaming apps not used (Netflix and YouTube kept)
+com.amazon.amazonvideo.livingroom           # Prime Video
+com.google.android.youtube.tvmusic          # YouTube Music
+com.google.android.videos                   # Play Movies & TV
