@@ -6,11 +6,13 @@
 #        The stock launcher is detected from the TV when -StockLauncher is not given.
 #        [-InputKeyService]   remote's Input button opens the input switcher (Google TV); re-pass on every install
 #        [-HomeKeyService]    remotes whose Home button sends KEYCODE_ALL_APPS (Xiaomi sticks)
+#        [-AppKeyService]     spare remote buttons open the apps in key_apps (config.xml); re-pass on every install
 param(
     [string]$TvHost = $env:TV_HOST,
     [string]$StockLauncher = '',
     [switch]$InputKeyService,
-    [switch]$HomeKeyService
+    [switch]$HomeKeyService,
+    [switch]$AppKeyService
 )
 $ErrorActionPreference = 'Stop'
 # Pipe plain UTF-8 to native commands; the default here prepends a BOM that corrupts the first command.
@@ -82,10 +84,14 @@ if ($homeNow -notlike 'com.gathin.tvhome/*') {
 }
 Write-Host "Home now resolves to $homeNow"
 # Optional accessibility services, appended to enabled_accessibility_services without dropping others.
+# Piped through --batch: Windows PowerShell 5.1 drops the inner double quotes from a native argument, and the
+# TV's shell then fails with "no closing quote".
 function Enable-Service([string]$Name) {
     $svc = "com.gathin.tvhome/.$Name"
-    & $py -I ..\tools\tv.py ('s=$(settings get secure enabled_accessibility_services); case "$s" in *' + $Name + '*) ;; null|"") settings put secure enabled_accessibility_services ' + $svc + ' ;; *) settings put secure enabled_accessibility_services "$s:' + $svc + '" ;; esac; settings put secure accessibility_enabled 1; echo ' + $Name + ' enabled')
+    ('s=$(settings get secure enabled_accessibility_services); case "$s" in *' + $Name + '*) ;; null|"") settings put secure enabled_accessibility_services ' + $svc + ' ;; *) settings put secure enabled_accessibility_services "$s:' + $svc + '" ;; esac; settings put secure accessibility_enabled 1; echo ' + $Name + ' enabled') |
+        & $py -I ..\tools\tv.py --batch
 }
 if ($InputKeyService) { Enable-Service 'InputKeyService' }
 if ($HomeKeyService) { Enable-Service 'HomeKeyService' }
+if ($AppKeyService) { Enable-Service 'AppKeyService' }
 Write-Host 'Installed. Press Home on the remote to see it.'

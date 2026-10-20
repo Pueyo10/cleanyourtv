@@ -95,6 +95,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private TextView btnWifi;
     private TextView shamsiDate;
     private boolean shamsi;
+    /** Name added to the greeting (config.xml, greeting_name); empty for the greeting alone. */
+    private String greetingName;
     private String vpnApp;
     private SpringAnimation springX, springY;
     private float glassTargetX, glassTargetY;
@@ -201,6 +203,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         ambient = findViewById(R.id.ambient);
         heroName = findViewById(R.id.heroName);
         greeting = findViewById(R.id.greeting);
+        greetingName = cfg.greetingName;
         btnWifi = findViewById(R.id.btnWifi);
         shamsiDate = findViewById(R.id.shamsiDate);
         shamsi = cfg.shamsiDate;
@@ -684,7 +687,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         else if (hour < 17) res = R.string.good_afternoon;
         else if (hour < 22) res = R.string.good_evening;
         else res = R.string.good_night;
-        greeting.setText(res);
+        greeting.setText(greetingName.isEmpty() ? getString(res)
+                : getString(R.string.greeting_with_name, getString(res), greetingName));
         if (shamsi) shamsiDate.setText(Shamsi.today());
     }
 

@@ -20,4 +20,6 @@
     <string name="cant_open">No se puede abrir %1$s</string>
     <string name="date_format">EEEE d \'de\' MMMM</string>
     <string name="dream_name">Reloj</string>
+    <string name="app_key_name">Botones de apps</string>
+    <string name="app_key_description">Abre las apps que elijas desde los botones sobrantes del mando.</string>
 </resources>

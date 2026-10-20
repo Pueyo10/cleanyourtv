@@ -40,6 +40,16 @@
          (XGIMI projectors: com.xgimi.action.hdmiPlayer). Leave empty to omit. -->
     <string name="input_action" translatable="false"></string>
 
+    <!-- Name added to the greeting, e.g. "Good evening, Ana". Leave empty for the greeting alone. -->
+    <string name="greeting_name" translatable="false"></string>
+
+    <!-- Remote buttons that open an app, one "KEYCODE_NAME=package" (or "123=package") per item, for keys whose
+         own app is gone, such as PatchWall. Needs the AppKeyService accessibility service: APP_KEY_SERVICE=1
+         build-and-install.sh, -AppKeyService on Windows. To see what a button sends:
+         tools/tv.py 'setprop log.tag.TvHomeKeys DEBUG', press it, then tools/tv.py 'logcat -d -s TvHomeKeys'. -->
+    <string-array name="key_apps">
+    </string-array>
+
     <!-- Show the Solar Hijri (Shamsi) date used in Iran and Afghanistan, e.g. "27 Mehr 1405", above the
          Gregorian date. -->
     <bool name="shamsi_date">false</bool>

@@ -46,6 +46,10 @@ final class Config {
     final boolean reducedMotion;
     final String vpnApp;
     final boolean showHomeSettingsShortcut;
+    /** Name added to the greeting; empty for the greeting alone. */
+    final String greetingName;
+    /** Remote buttons that open an app, "KEYCODE_NAME=package" each; read by AppKeyService. */
+    final List<String> keyApps;
     /** Background colour behind everything, #RRGGBB; black unless a theme says otherwise. */
     final int backgroundColor;
     /** Full-screen picture behind the launcher, or null for the plain colour. */
@@ -57,8 +61,8 @@ final class Config {
                    String sourcePanelService, String sourcePanelAction, String inputAction,
                    int columns, int rowsBelowDock,
                    boolean shamsiDate, boolean moduleCards, boolean reducedMotion, String vpnApp,
-                   boolean showHomeSettingsShortcut, int backgroundColor,
-                   File wallpaper, boolean overlayApplied) {
+                   boolean showHomeSettingsShortcut, String greetingName, List<String> keyApps,
+                   int backgroundColor, File wallpaper, boolean overlayApplied) {
         this.dockApps = Collections.unmodifiableList(dockApps);
         this.hiddenApps = Collections.unmodifiableList(hiddenApps);
         this.liveTvPackage = liveTvPackage;
@@ -73,6 +77,8 @@ final class Config {
         this.reducedMotion = reducedMotion;
         this.vpnApp = vpnApp;
         this.showHomeSettingsShortcut = showHomeSettingsShortcut;
+        this.greetingName = greetingName;
+        this.keyApps = Collections.unmodifiableList(keyApps);
         this.backgroundColor = backgroundColor;
         this.wallpaper = wallpaper;
         this.overlayApplied = overlayApplied;
@@ -99,6 +105,8 @@ final class Config {
         boolean reducedMotion = res.getBoolean(R.bool.reduced_motion);
         String vpn = res.getString(R.string.vpn_app).trim();
         boolean homeSettings = res.getBoolean(R.bool.show_home_settings_shortcut);
+        String greetingName = res.getString(R.string.greeting_name).trim();
+        List<String> keyApps = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.key_apps)));
         int background = 0xFF000000;
         boolean applied = false;
 
@@ -121,6 +129,8 @@ final class Config {
             reducedMotion = bool(json, "reduced_motion", reducedMotion);
             vpn = string(json, "vpn_app", vpn);
             homeSettings = bool(json, "show_home_settings_shortcut", homeSettings);
+            greetingName = string(json, "greeting_name", greetingName);
+            keyApps = stringList(json, "key_apps", keyApps);
             background = color(json, "background_color", background);
         }
         File wallpaper = dir != null ? new File(dir, WALLPAPER_NAME) : null;
@@ -130,7 +140,7 @@ final class Config {
 
         return new Config(dock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(0, rowsBelow), shamsi, moduleCards, reducedMotion,
-                vpn, homeSettings, background, wallpaper, applied);
+                vpn, homeSettings, greetingName, keyApps, background, wallpaper, applied);
     }
 
     /** Reads and parses the overlay; any problem means "no overlay", never a crash on the home screen. */
