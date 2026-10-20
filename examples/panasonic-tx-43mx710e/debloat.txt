@@ -1,0 +1,53 @@
+# Panasonic TX-43MX710E (Vestel-built, MediaTek, device kowloon, ro.product.model "Panasonic Google TV LCD"),
+# Google TV / Android 14 (SDK 34), firmware UKNV.260729.001. Connected over Ethernet; port 5555 was open with
+# USB debugging on (no wireless-debugging pairing needed).
+#
+# Stock launcher:  com.google.android.apps.tv.launcherx
+# Live TV app:     com.mediatek.wwtv.tvcenter  (keep; Inputs and HDMI open it)
+# HOME claimants:  launcherx (priority 2), com.google.android.tungsten.setupwraith (1), com.android.tv.settings (-1000)
+#
+# Apply:   TV_HOST=<tv ip> tools/disable.sh examples/panasonic-tx-43mx710e/debloat.txt
+# Undo:    TV_HOST=<tv ip> tools/restore.sh examples/panasonic-tx-43mx710e/debloat.txt com.google.android.apps.tv.launcherx
+# Everything is DISABLED, not uninstalled. Comment out any line you want to keep.
+#
+# Keep (TV needs them): every com.mediatek.* (tuner, HDMI, Live TV, MMP USB player, opapp operator apps),
+# com.vestel.tv.keycontroller (remote's global keys, system uid), com.vestel.tv.service (Bluetooth remote wizard),
+# com.vestel.tv.backlight, com.vestel.tv.advancedsettings (eco dashboard), com.dolby.android.audio.service.
+# Left alone on purpose: com.vestel.smartcenter (persistent; Smart Center phone app link),
+# com.vewd.core.browser (on Vestel sets usually the HbbTV engine), com.mstar.android.tv.disclaimercustomization.
+# Kept by owner's choice: Gemini / voice (katniss), Chromecast (mediashell), firmware updates,
+# Google ambient screensaver (dreamx), Netflix, YouTube, Prime Video.
+# Already disabled at the factory: com.vestel.easysatelliteinstallation, com.google.android.marvin.talkback.
+
+# Telemetry
+com.vestel.vestelreporter                   # Vestel reporter, starts at boot
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.google.android.partnersetup             # RLZ partner attribution pings
+
+# Background services nobody needs on a TV
+com.vestel.tv.speedup                       # Vestel "speed up" cleaner
+com.android.backupconfirm
+com.android.sharedstoragebackup
+com.android.wallpaperbackup
+com.android.htmlviewer
+com.google.android.syncadapters.calendar
+com.android.providers.calendar
+
+# Preloads
+fusion.android.tv.demo                      # retail demo mode
+com.vestel.tv.eib                           # Electronic Information Booklet (e-manual)
+com.google.android.play.games
+
+# Personal choice: streaming apps not used
+com.google.android.youtube.tvmusic
+com.google.android.videos                   # Google TV / Play Movies
+com.wbd.stream                              # Max (installed by the owner)
+com.plexapp.android                         # installed by the owner
+com.esaba.downloader                        # installed by the owner
+ch.protonvpn.android                        # installed by the owner
+
+# Google TV setup wizard: claims HOME at priority 1 once launcherx is disabled. Disable it after launcher/ is
+# installed and before the stock launcher goes. The saved network here belonged to android.uid.system
+# (dumpsys wifi | grep -o 'cname=[^ ]*'), so nothing was lost. Re-enable before a factory reset (restore does).
+com.google.android.tungsten.setupwraith
