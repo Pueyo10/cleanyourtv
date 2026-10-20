@@ -41,11 +41,8 @@ com.google.android.play.games
 
 # Personal choice: streaming apps not used
 com.google.android.youtube.tvmusic
-com.google.android.videos                   # Google TV / Play Movies
-com.wbd.stream                              # Max (installed by the owner)
-com.plexapp.android                         # installed by the owner
-com.esaba.downloader                        # installed by the owner
-ch.protonvpn.android                        # installed by the owner
+# Also removed on this TV, by the owner's choice (Play Store installs, so not in this list): Google TV /
+# Play Movies (com.google.android.videos), Max, Plex, Downloader, Proton VPN.
 
 # Google TV setup wizard: claims HOME at priority 1 once launcherx is disabled. Disable it after launcher/ is
 # installed and before the stock launcher goes. The saved network here belonged to android.uid.system
