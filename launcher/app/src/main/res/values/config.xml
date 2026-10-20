@@ -20,6 +20,7 @@
         <item>com.mediatek.wwtv.tvcenter</item>
         <item>com.android.tv.settings</item>   <!-- the Settings pill already opens it -->
         <item>com.mediatek.wwtv.mediaplayer</item>   <!-- MMP USB player: kept enabled, just no tile -->
+        <item>com.vestel.tv.advancedsettings</item>  <!-- Vestel eco dashboard: kept enabled (eco modes), just no tile -->
     </string-array>
 
     <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit. -->
