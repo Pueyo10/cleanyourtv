@@ -20,7 +20,7 @@ DIR=/sdcard/Android/data/$PKG/files
 tv() { "$PY" -I tv.py "$@"; }
 
 if [ "${1:-}" = --reset ]; then
-  tv "rm -f $DIR/config.json $DIR/wallpaper.jpg; am force-stop $PKG; am start -n $PKG/.MainActivity >/dev/null; echo reset" | tail -n 1
+  tv "rm -f $DIR/config.json $DIR/wallpaper.jpg $DIR/wallpaper-*.jpg; am force-stop $PKG; am start -n $PKG/.MainActivity >/dev/null; echo reset" | tail -n 1
   exit 0
 fi
 THEME="${THEME_ARG:?usage: theme.sh <theme folder> | --reset}"
@@ -30,10 +30,10 @@ python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$THEME/config.json" 
 
 tv "mkdir -p $DIR" >/dev/null
 tv --push "$THEME/config.json" "$DIR/config.json"
-if [ -f "$THEME/wallpaper.jpg" ]; then
-  "$PY" -I b64push.py "$THEME/wallpaper.jpg" "$DIR/wallpaper.jpg"
-else
-  tv "rm -f $DIR/wallpaper.jpg" >/dev/null
-fi
+# wallpaper.jpg plus any wallpaper-*.jpg (they take turns on the TV); drop the previous theme's pictures first.
+tv "rm -f $DIR/wallpaper.jpg $DIR/wallpaper-*.jpg" >/dev/null
+for WALL in "$THEME"/wallpaper.jpg "$THEME"/wallpaper-*.jpg; do
+  if [ -f "$WALL" ]; then "$PY" -I b64push.py "$WALL" "$DIR/$(basename "$WALL")"; fi
+done
 tv "am force-stop $PKG; am start -n $PKG/.MainActivity >/dev/null; echo applied" | tail -n 1
 echo "Theme $(basename "$THEME") is on the TV. Undo with: tools/theme.sh --reset"

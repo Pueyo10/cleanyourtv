@@ -52,8 +52,10 @@ final class Config {
     final List<String> keyApps;
     /** Background colour behind everything, #RRGGBB; black unless a theme says otherwise. */
     final int backgroundColor;
-    /** Full-screen picture behind the launcher, or null for the plain colour. */
-    final File wallpaper;
+    /** Full-screen pictures behind the launcher (wallpaper.jpg, then wallpaper-*.jpg by name); empty for the plain colour. */
+    final List<File> wallpapers;
+    /** With several wallpapers, minutes each one stays before the next (theme key wallpaper_minutes). */
+    final int wallpaperMinutes;
     /** Whether the overlay file was present and parsed. */
     final boolean overlayApplied;
 
@@ -62,7 +64,7 @@ final class Config {
                    int columns, int rowsBelowDock,
                    boolean shamsiDate, boolean moduleCards, boolean reducedMotion, String vpnApp,
                    boolean showHomeSettingsShortcut, String greetingName, List<String> keyApps,
-                   int backgroundColor, File wallpaper, boolean overlayApplied) {
+                   int backgroundColor, List<File> wallpapers, int wallpaperMinutes, boolean overlayApplied) {
         this.dockApps = Collections.unmodifiableList(dockApps);
         this.hiddenApps = Collections.unmodifiableList(hiddenApps);
         this.liveTvPackage = liveTvPackage;
@@ -80,7 +82,8 @@ final class Config {
         this.greetingName = greetingName;
         this.keyApps = Collections.unmodifiableList(keyApps);
         this.backgroundColor = backgroundColor;
-        this.wallpaper = wallpaper;
+        this.wallpapers = Collections.unmodifiableList(wallpapers);
+        this.wallpaperMinutes = wallpaperMinutes;
         this.overlayApplied = overlayApplied;
     }
 
@@ -108,6 +111,7 @@ final class Config {
         String greetingName = res.getString(R.string.greeting_name).trim();
         List<String> keyApps = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.key_apps)));
         int background = 0xFF000000;
+        int wallpaperMinutes = 60;
         boolean applied = false;
 
         File dir = dir(ctx);
@@ -132,15 +136,26 @@ final class Config {
             greetingName = string(json, "greeting_name", greetingName);
             keyApps = stringList(json, "key_apps", keyApps);
             background = color(json, "background_color", background);
+            wallpaperMinutes = integer(json, "wallpaper_minutes", wallpaperMinutes, 1, 24 * 60);
         }
-        File wallpaper = dir != null ? new File(dir, WALLPAPER_NAME) : null;
-        if (wallpaper != null && !(wallpaper.isFile() && wallpaper.length() > 0)) wallpaper = null;
-        // A theme can also switch the wallpaper off while the file is still there.
-        if (json != null && json.has("wallpaper") && !bool(json, "wallpaper", true)) wallpaper = null;
+        // wallpaper.jpg first, then any wallpaper-*.jpg in name order: several of them take turns.
+        List<File> wallpapers = new ArrayList<>();
+        File[] found = dir != null ? dir.listFiles() : null;
+        if (found != null) {
+            Arrays.sort(found);
+            File main = new File(dir, WALLPAPER_NAME);
+            if (main.isFile() && main.length() > 0) wallpapers.add(main);
+            for (File f : found) {
+                String n = f.getName();
+                if (n.startsWith("wallpaper-") && n.endsWith(".jpg") && f.isFile() && f.length() > 0) wallpapers.add(f);
+            }
+        }
+        // A theme can also switch the wallpaper off while the files are still there.
+        if (json != null && json.has("wallpaper") && !bool(json, "wallpaper", true)) wallpapers.clear();
 
         return new Config(dock, hidden, liveTv, liveTvAction, panelService, panelAction, inputAction,
                 Math.max(1, columns), Math.max(0, rowsBelow), shamsi, moduleCards, reducedMotion,
-                vpn, homeSettings, greetingName, keyApps, background, wallpaper, applied);
+                vpn, homeSettings, greetingName, keyApps, background, wallpapers, wallpaperMinutes, applied);
     }
 
     /** Reads and parses the overlay; any problem means "no overlay", never a crash on the home screen. */

@@ -39,12 +39,17 @@ is ignored, and a file that doesn't parse is ignored as a whole, so a theme can 
 | `key_apps` | list of `"KEYCODE_NAME=package"` | Remote buttons that open an app; needs the AppKeyService (`APP_KEY_SERVICE=1` at install) |
 | `background_color` | `#RRGGBB` | Colour behind everything; black by default |
 | `wallpaper` | bool | Show `wallpaper.jpg` from the theme folder (`true`), or ignore it (`false`) |
+| `wallpaper_minutes` | 1 to 1440 | With several wallpapers, minutes each stays before the next; 60 by default |
 
 ## Wallpapers
 
 `wallpaper.jpg` is drawn full screen behind the launcher, centre-cropped. Keep it dark, 1920×1080 and
 under about 300 KB: the text, the hero name and the dock band are designed for black, and a 1 GB TV
 decodes the picture into memory on every Home start. Pictures larger than the screen are downsampled.
+
+Add `wallpaper-2.jpg`, `wallpaper-3.jpg` and so on next to it and they take turns, `wallpaper.jpg` first and
+the rest in name order, each for `wallpaper_minutes`. The turn follows the clock, so there is no background
+service: Home checks it on its minute tick and when you come back to it, and only one picture is in memory.
 
 ## Reduced motion
 

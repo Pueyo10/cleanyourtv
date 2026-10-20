@@ -21,7 +21,7 @@ $pkg = 'com.gathin.tvhome'
 $dir = "/sdcard/Android/data/$pkg/files"
 
 if ($Reset) {
-    & $py -I tv.py "rm -f $dir/config.json $dir/wallpaper.jpg; am force-stop $pkg; am start -n $pkg/.MainActivity >/dev/null; echo reset"
+    & $py -I tv.py "rm -f $dir/config.json $dir/wallpaper.jpg $dir/wallpaper-*.jpg; am force-stop $pkg; am start -n $pkg/.MainActivity >/dev/null; echo reset"
     exit 0
 }
 if (-not $Theme) { throw 'usage: theme.ps1 <theme folder> | -Reset' }
@@ -31,7 +31,10 @@ try { Get-Content $config -Raw | ConvertFrom-Json | Out-Null } catch { throw "$c
 
 & $py -I tv.py "mkdir -p $dir" | Out-Null
 & $py -I tv.py --push $config "$dir/config.json"
-$wall = Join-Path $Theme 'wallpaper.jpg'
-if (Test-Path $wall) { & $py -I b64push.py $wall "$dir/wallpaper.jpg" } else { & $py -I tv.py "rm -f $dir/wallpaper.jpg" | Out-Null }
+# wallpaper.jpg plus any wallpaper-*.jpg (they take turns on the TV); drop the previous theme's pictures first.
+& $py -I tv.py "rm -f $dir/wallpaper.jpg $dir/wallpaper-*.jpg" | Out-Null
+foreach ($wall in @(Get-ChildItem $Theme -File | Where-Object { $_.Name -eq 'wallpaper.jpg' -or $_.Name -like 'wallpaper-*.jpg' })) {
+    & $py -I b64push.py $wall.FullName "$dir/$($wall.Name)"
+}
 & $py -I tv.py "am force-stop $pkg; am start -n $pkg/.MainActivity >/dev/null; echo applied"
 Write-Host "Theme $(Split-Path $Theme -Leaf) is on the TV. Undo with: tools\theme.ps1 -TvHost $TvHost -Reset"
